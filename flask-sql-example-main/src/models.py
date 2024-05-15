@@ -6,15 +6,13 @@ from sqlalchemy.orm import Mapped, relationship
 from . import db
 
 
-class Login(db.Model):
-    __tablename__ = "login"
+class Register(db.Model):
+    __tablename__ = "register"
 
-    gmail = Column(String, primary_key=True)
-    password = Column(String)
+    id = Column(Integer, primary_key=True)
+   # userName = Column(String, unique=True, nullable=False)
+    gmail = Column(String, unique=True, nullable=False)
+    password = Column(String, nullable=False)
+
     
-
-
-   
-
-
-
+  
