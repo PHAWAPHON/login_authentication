@@ -1,23 +1,27 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
 </head>
-
 <body>
-  <form method="POST" action="{{ url_for( 'login.check_login' ) }}">
-  <h1>Register</h1>
-    Email <input type="text" name="gmail" placeholder="Email">
-    Password <input type="password" name="password" placeholder="Password">
+  <form id="loginForm" method="POST" action="{{ url_for('login.check_login') }}">
+    <h1>Login</h1>
+    Email <input type="text" name="gmail" placeholder="Email" required>
+    Password <input type="password" name="password" placeholder="Password" required>
     <input type="submit" value="Submit">
   </form>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.4.0/axios.min.js"></script>
-  <script>
 
-  </script>
+  {% if otp_required %}
+  <div id="otpModal">
+    <h2>Enter OTP</h2>
+    <form id="otpForm" method="POST" action="{{ url_for('login.verify_otp') }}">
+      <input type="hidden" name="gmail" value="{{ gmail }}">
+      OTP: <input type="text" name="otp" placeholder="OTP" required>
+      <button type="submit">Submit OTP</button>
+    </form>
+  </div>
+  {% endif %}
 </body>
-
 </html>

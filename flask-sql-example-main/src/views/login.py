@@ -1,17 +1,18 @@
-from flask import Blueprint, render_template, request, url_for, redirect, session
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash
 from sqlalchemy.exc import IntegrityError
 from ..models import Register, db
 import redis
 import jwt
-import math, random
+import random
 import smtplib
 from email.message import EmailMessage
+import jwt
 
 r = redis.Redis(host='localhost', port=6379, db=0)
 
 server = smtplib.SMTP("smtp.gmail.com", 587)
 server.starttls()
-server.login("", "")
+server.login("misternarn@gmail.com", "vuse xmch fosd yaxs")
 
 bp = Blueprint("login", __name__, url_prefix="/login")
 
@@ -36,28 +37,29 @@ def check_login():
     if not user:
         return "Incorrect email or password", 401
 
-    opt = generateOTP()
+    otp = generateOTP()
 
-    r.set(email, opt)
+    r.set(email, otp)
 
-    from_mail = ""
-    to_mail = ""
+    from_mail = "misternarn@gmail.com"
+    to_mail = email 
 
     msg = EmailMessage()
     msg["Subject"] = "OTP Verification"
     msg["From"] = from_mail
     msg["To"] = to_mail
-    msg.set_content("Your OTP is " + opt)
+    msg.set_content("Your OTP is " + otp)
 
     server.send_message(msg)
 
-    return redirect(url_for("login.login"))
+    return render_template("login.html.jinja", otp_required=True, email=email)
 
 @bp.route("/verify", methods=["POST"])
 def verify_otp():
-    email = request.form.get("email")
+    email = request.form.get("gmail")
     otp = request.form.get("otp")
-
+    print(email)
+    
     if not email or not otp:
         return "Email and OTP are required", 400
 
@@ -65,9 +67,7 @@ def verify_otp():
     if not stored_otp or stored_otp.decode('utf-8') != otp:
         return "Invalid OTP", 401
 
-    token = jwt.encode({'email': email}, otp, algorithm='HS256')
+    token = jwt.encode({'gmail': email}, otp, algorithm='HS256')
     session['token'] = token
-
-    return redirect(url_for("login.login")) 
-
-
+    
+    return redirect(url_for("login.login"))

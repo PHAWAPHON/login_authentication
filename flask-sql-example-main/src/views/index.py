@@ -1,35 +1,44 @@
-from flask import Blueprint, render_template, request, url_for, redirect
+from flask import Blueprint, render_template, request, url_for, redirect, jsonify
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from ..models import Register, db
 
-
-
 bp = Blueprint("index", __name__, url_prefix="/")
-
-
-
 
 @bp.route("", methods=["GET"])
 def index():
     return render_template("index.html.jinja")
 
-
 @bp.route("", methods=["POST"])
 def create_user():
-    userName = request.form.get("userName")
-    gmail = request.form.get("gmail")
-    password = request.form.get("password")
+    userName = request.form.get("userName", "")
+    gmail = request.form.get("gmail", "")
+    password = request.form.get("password", "")
+    
+    print(userName)
+    print(gmail)
+    print(password)
 
-    if not id or not gmail or not password:
-        return "fail", 400
+    if not userName or not gmail or not password:
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    existing_user = db.session.execute(select(Register).filter_by(userName=userName)).first()
+    if existing_user:
+        return jsonify({'error': 'Username already exists'}), 400
 
     user = Register()
     user.userName = userName
     user.gmail = gmail
     user.password = password
-
-    db.session.add(user)
-    db.session.commit()
     
-
-    return redirect(url_for("login.login"))
+    print(user.userName)
+    print(user.gmail)
+    print(user.password)
+    
+    db.session.add(user)
+    try:
+        db.session.commit()
+        return redirect(url_for("login.login"))
+    except IntegrityError:
+        db.session.rollback()
+        return jsonify({'error': 'An error occurred while creating the user'}), 400
