@@ -11,7 +11,7 @@ r = redis.Redis(host='localhost', port=6379, db=0)
 
 server = smtplib.SMTP("smtp.gmail.com", 587)
 server.starttls()
-server.login("misternarn@gmail.com", "vuse xmch fosd yaxs")
+server.login("", "")
 
 bp = Blueprint("login", __name__, url_prefix="/login")
 
@@ -40,8 +40,8 @@ def check_login():
 
     r.set(email, opt)
 
-    from_mail = "misternarn@gmail.com"
-    to_mail = "phetchuen_p@silpakorn.edu"
+    from_mail = ""
+    to_mail = ""
 
     msg = EmailMessage()
     msg["Subject"] = "OTP Verification"
