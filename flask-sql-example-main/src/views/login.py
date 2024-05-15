@@ -1,4 +1,5 @@
 from flask import Blueprint, render_template, request, url_for, redirect, session, flash
+import flask
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import  update
 from ..models import Register, db
@@ -26,11 +27,12 @@ def generateOTP():
 def login():
     return render_template("login.html.jinja")
 
-@bp.route("/auth", methods=["POST"])
+@bp.route("", methods=["POST"])
 def check_login():
     email = request.form.get("gmail")
     password = request.form.get("password")
-
+    print(email)
+    print(password)
     if not email or not password:
         return "Email and password are required", 400
 
@@ -73,9 +75,12 @@ def verify_otp():
     db.session.execute(update(Register).where(Register.gmail == email).values({"token":token}))
     db.session.commit()
     
+    print(token)
     return redirect(url_for("login.login"))
 
 @bp.route("/push_token", methods=["GET"])
 def push_token():
-    token = request.args.get("token")
+    headers = flask.request.headers
+    bearer = headers.get('Authorization')    
+    token = bearer.split()[1]
     print(token)
