@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, request, url_for, redirect, session, flash
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import  update
 from ..models import Register, db
 import redis
 import jwt
@@ -56,7 +57,7 @@ def check_login():
 
 @bp.route("/verify", methods=["POST"])
 def verify_otp():
-    email = request.form.get("gmail")
+    email = request.form.get("email")
     otp = request.form.get("otp")
     print(email)
     
@@ -68,6 +69,13 @@ def verify_otp():
         return "Invalid OTP", 401
 
     token = jwt.encode({'gmail': email}, otp, algorithm='HS256')
-    session['token'] = token
+
+    db.session.execute(update(Register).where(Register.gmail == email).values({"token":token}))
+    db.session.commit()
     
     return redirect(url_for("login.login"))
+
+@bp.route("/push_token", methods=["GET"])
+def push_token():
+    token = request.args.get("token")
+    print(token)

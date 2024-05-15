@@ -13,6 +13,7 @@ class Register(db.Model):
     userName = Column(String, unique=True, nullable=False)
     gmail = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
+    token  = Column(String, nullable=True)
 
     
   

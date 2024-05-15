@@ -17,7 +17,7 @@
   <div id="otpModal">
     <h2>Enter OTP</h2>
     <form id="otpForm" method="POST" action="{{ url_for('login.verify_otp') }}">
-      <input type="hidden" name="gmail" value="{{ gmail }}">
+      <input type="hidden" name="email" value="{{ email }}">
       OTP: <input type="text" name="otp" placeholder="OTP" required>
       <button type="submit">Submit OTP</button>
     </form>
