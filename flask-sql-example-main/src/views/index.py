@@ -11,7 +11,7 @@ def index():
 
 @bp.route("", methods=["POST"])
 def create_user():
-    id = request.form.get("id")
+    userName = request.form.get("userName")
     gmail = request.form.get("email")
     password = request.form.get("password")
 
@@ -19,8 +19,7 @@ def create_user():
         return "fail", 400
     
     user = Register()
-
-    user.id = id
+    user.userName = userName
     user.gmail = gmail
     user.password = password
 

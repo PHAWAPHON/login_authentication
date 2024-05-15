@@ -9,8 +9,8 @@ from . import db
 class Register(db.Model):
     __tablename__ = "register"
 
-    id = Column(Integer, primary_key=True)
-   # userName = Column(String, unique=True, nullable=False)
+    id = Column(Integer,index=True, primary_key=True)
+    userName = Column(String, unique=True, nullable=False)
     gmail = Column(String, unique=True, nullable=False)
     password = Column(String, nullable=False)
 
