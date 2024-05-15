@@ -7,4 +7,3 @@ bp = Blueprint("register", __name__, url_prefix="/register")
 def register():
     return render_template("register.html.jinja")
 
-#test
