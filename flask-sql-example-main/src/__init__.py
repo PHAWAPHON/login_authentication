@@ -31,9 +31,9 @@ def create_app() -> Flask:
     with app.app_context():
         db.create_all()
 
-    from .views import index,register
+    from .views import index,login
     app.register_blueprint(index.bp)
-    app.register_blueprint(register.bp)
+    app.register_blueprint(login.bp)
  
 
     from .exceptions import (InvalidSubjectID, MissingRequiredKey,
