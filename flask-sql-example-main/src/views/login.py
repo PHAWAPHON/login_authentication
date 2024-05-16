@@ -10,7 +10,7 @@ r = redis.Redis(host='localhost', port=6379, db=0)
 
 server = smtplib.SMTP("smtp.gmail.com", 587)
 server.starttls()
-server.login("misternarn@gmail.com", "vuse xmch fosd yaxs")
+server.login("", "")
 
 bp = Blueprint("login", __name__, url_prefix="/login")
 
@@ -43,7 +43,7 @@ def check_login():
     otp = generateOTP()
     r.set(email, otp)
 
-    from_mail = "misternarn@gmail.com"
+    from_mail = ""
     to_mail = email 
 
     msg = EmailMessage()
