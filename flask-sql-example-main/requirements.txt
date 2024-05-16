@@ -3,3 +3,5 @@ flask_cors
 flask-limiter
 flask_sqlalchemy
 pyotp
+redis
+pyjwt

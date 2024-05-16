@@ -1,7 +1,7 @@
-from flask import Blueprint, render_template, request, url_for, redirect, session, flash
+from flask import Blueprint, render_template, request, url_for, redirect, session, flash, jsonify
 import flask
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy import  update
+from sqlalchemy import  update, select
 from ..models import Register, db
 import redis, jwt, random, smtplib, hashlib
 from email.message import EmailMessage 
@@ -30,7 +30,7 @@ def check_login():
 
     if not email or not password:
         return "Email and password are required", 400
-
+    
     user = Register.query.filter_by(gmail=email).first()
     
     #print(user.password)
@@ -39,7 +39,7 @@ def check_login():
     if not user or user.password != hashlib.md5((password + "5gz").encode()).hexdigest():
         return "Incorrect email or password", 401
     
-   
+    
     otp = generateOTP()
     r.set(email, otp)
 
@@ -51,7 +51,7 @@ def check_login():
     msg["From"] = from_mail
     msg["To"] = to_mail
     msg.set_content("Your OTP is " + otp)
-
+    r.expire(email, 60)
     server.send_message(msg)
 
     return render_template("login.html.jinja", otp_required=True, email=email)
@@ -69,8 +69,10 @@ def verify_otp():
     stored_otp = r.get(email)
     if not stored_otp or stored_otp.decode('utf-8') != otp:
         return "Invalid OTP", 401
+    
+    secret_key = "LOL"
 
-    token = jwt.encode({'gmail': email}, otp, algorithm='HS256')
+    token = jwt.encode({'gmail': email}, secret_key , algorithm='HS256')
 
     db.session.execute(update(Register).where(Register.gmail == email).values({"token":token}))
     db.session.commit()
@@ -81,6 +83,22 @@ def verify_otp():
 @bp.route("/push_token", methods=["GET"])
 def push_token():
     headers = flask.request.headers
-    bearer = headers.get('Authorization')    
+    bearer = headers.get('Authorization')
+
+    if not bearer or 'Bearer ' not in bearer:
+        return jsonify({"error": "Invalid token"}), 401
+
     token = bearer.split()[1]
-    print(token)
+    user = Register.query.filter_by(token=token).first()
+
+    if not user:
+        return jsonify({"error": "User not found or token is invalid"}), 401
+    else:
+        
+        return jsonify({"email": user.gmail,"status": "success"}), 200
+    
+    
+    
+
+    
+
