@@ -15,5 +15,7 @@ class Register(db.Model):
     password = Column(String, nullable=False)
     token  = Column(String, nullable=True)
 
+
+#
     
   

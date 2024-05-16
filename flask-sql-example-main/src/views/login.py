@@ -3,12 +3,8 @@ import flask
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import  update
 from ..models import Register, db
-import redis
-import jwt
-import random
-import smtplib
-from email.message import EmailMessage
-import jwt
+import redis, jwt, random, smtplib, hashlib
+from email.message import EmailMessage 
 
 r = redis.Redis(host='localhost', port=6379, db=0)
 
@@ -31,17 +27,20 @@ def login():
 def check_login():
     email = request.form.get("gmail")
     password = request.form.get("password")
-    print(email)
-    print(password)
+
     if not email or not password:
         return "Email and password are required", 400
 
-    user = Register.query.filter_by(gmail=email, password=password).first()
-    if not user:
+    user = Register.query.filter_by(gmail=email).first()
+    
+    #print(user.password)
+    #print(hashlib.md5((password + "5gz").encode()).hexdigest())
+    
+    if not user or user.password != hashlib.md5((password + "5gz").encode()).hexdigest():
         return "Incorrect email or password", 401
-
+    
+   
     otp = generateOTP()
-
     r.set(email, otp)
 
     from_mail = "misternarn@gmail.com"
@@ -56,6 +55,7 @@ def check_login():
     server.send_message(msg)
 
     return render_template("login.html.jinja", otp_required=True, email=email)
+
 
 @bp.route("/verify", methods=["POST"])
 def verify_otp():

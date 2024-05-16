@@ -2,6 +2,7 @@ from flask import Blueprint, render_template, request, url_for, redirect, jsonif
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy import select
 from ..models import Register, db
+import hashlib
 
 bp = Blueprint("index", __name__, url_prefix="/")
 
@@ -14,6 +15,10 @@ def create_user():
     userName = request.form.get("userName", "")
     gmail = request.form.get("gmail", "")
     password = request.form.get("password", "")
+    salt = "5gz"
+    hash_password = password+salt
+    hashed = hashlib.md5(hash_password.encode())
+    print(hashed.hexdigest())
     
     print(userName)
     print(gmail)
@@ -29,7 +34,7 @@ def create_user():
     user = Register()
     user.userName = userName
     user.gmail = gmail
-    user.password = password
+    user.password = hashed.hexdigest()
     
     print(user.userName)
     print(user.gmail)
